@@ -1,0 +1,24 @@
+run:
+  timeout: 3m
+
+linters:
+  presets:
+    - bugs
+    - unused
+    - performance
+    - error
+    - format
+  enable:
+    - gosec
+    - goimports
+
+issues:
+  exclude-use-default: false
+
+linters-settings:
+  govet:
+    enable-all: true
+  gosec:
+    exclude-generated: true
+    severity: "low"
+    confidence: "low"

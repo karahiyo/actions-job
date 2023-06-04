@@ -1,0 +1,5 @@
+export GH_APP_ID=
+export GH_APP_INSTALLATION_ID=
+export GH_APP_PRIVATE_KEY=`cat <path-to-your-github-app-private-key-pem-file>`
+export LOG_LEVEL=debug
+export WEBHOOK_SECRET=`cat <path-to-your-webhook-secret-file>`
