@@ -68,6 +68,7 @@ func HandleWebhookEvents(controller *service.Controller) func(http.ResponseWrite
 
 			w.WriteHeader(http.StatusOK)
 			return
+
 		default:
 			logger.Warn().Msgf("received not register event(%s), return NotFound", payload)
 			w.WriteHeader(http.StatusNotFound)

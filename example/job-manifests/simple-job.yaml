@@ -1,0 +1,22 @@
+# see https://cloud.google.com/run/docs/reference/yaml/v1
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: actions-job-simple-test
+spec:
+  template:
+    spec:
+      parallelism: 1
+      taskCount: 1
+      template:
+        spec:
+          maxRetries: 1
+          timeoutSeconds: "300"
+          containers:
+            - image: ghcr.io/karahiyo/actions-job:latest
+              env:
+                - name: ACCESS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      key: latest
+                      name: github-actions-runner-access-token

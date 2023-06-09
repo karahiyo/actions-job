@@ -1,3 +1,3 @@
 # actions-job/docker/runner
 
-Actions runner container image.
+Actions runner container images.

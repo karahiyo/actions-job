@@ -22,7 +22,7 @@ type (
 	}
 
 	GCPConfig struct {
-		CloudRunAdminApiEndpoint string `env:"CLOUD_RUN_ADMIN_API_ENDPOINT" envDefault:"https://run.googleapis.com"`
+		Region string `env:"REGION" envDefault:"us-central1"`
 	}
 
 	GitHubAppConfig struct {

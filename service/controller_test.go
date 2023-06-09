@@ -1,4 +1,4 @@
-package adapter
+package service
 
 import (
 	"testing"
@@ -61,7 +61,7 @@ spec:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseJobManifest([]byte(tt.args.manifest))
+			got, err := parseJobManifest([]byte(tt.args.manifest))
 			if err != nil {
 				t.Errorf("failed to parse manifest: %v", err)
 			}

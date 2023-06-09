@@ -11,17 +11,22 @@ on:
       - '.github/workflows/actions-job.yaml'
 
 jobs:
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
+
     env:
       REGISTRY: ghcr.io
       IMAGE_NAMESPACE: ${{ github.repository_owner }}
-      IMAGE_NAME: actions-job
+
     permissions:
       packages: write
       contents: read
+
+    strategy:
+      matrix:
+        include:
+          - name: actions-job
+            os: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v3
@@ -40,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ matrix.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -53,6 +58,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./docker/runner
+          file: ./docker/runner/${{ matrix.name }}.${{ matrix.os }}.dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
