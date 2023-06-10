@@ -8,7 +8,7 @@ on:
     branches: [ "*" ]
     paths:
       - 'docker/runner/*'
-      - '.github/workflows/actions-job.yaml'
+      - '.github/workflows/actions-job-ci.yaml'
 
 jobs:
   push:
