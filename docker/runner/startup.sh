@@ -49,6 +49,12 @@ RUNNER_TOKEN=$(curl \
   | jq -r .token
 )
 
+config_args=()
+if [ "${DISABLE_RUNNER_UPDATE:-}" == "true" ]; then
+  config_args+=(--disableupdate)
+  echo 'Passing --disableupdate to config.sh to disable automatic runner updates.'
+fi
+
 ./config.sh --unattended \
   --url "https://github.com/${OWNER}/${REPO}" \
   --token "${RUNNER_TOKEN}" \
@@ -56,7 +62,7 @@ RUNNER_TOKEN=$(curl \
   --name "${RUNNER_NAME}" \
   --replace \
   --ephemeral \
-  --disableupdate
+  "${config_args[@]}"
 
 # Unset entrypoint environment variables so they don't leak into the runner environment
 unset OWNER REPO LABELS ACCESS_TOKEN RUNNER_TOKEN RUNNER_NAME
