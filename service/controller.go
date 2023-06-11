@@ -213,10 +213,12 @@ func useDoodContainer(job *run.Job) *run.Job {
 }
 
 func addSidecarDockerContainer(job *run.Job) *run.Job {
-	job.Spec.Template.Spec.Template.Spec.Containers[1] = &run.Container{
-		Name:  "docker",
-		Image: "docker:dind-rootless",
-	}
+	job.Spec.Template.Spec.Template.Spec.Containers = append(
+		job.Spec.Template.Spec.Template.Spec.Containers,
+		&run.Container{
+			Name:  "docker",
+			Image: "docker:dind-rootless",
+		})
 
 	return job
 }
