@@ -95,8 +95,8 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 		labels: labels,
 	})
 
+	// if job has dood enabled option, add sidecar container to job manifest
 	if isDockerActionEnabled(job) {
-		// TODO: if job has dood enabled option, add sidecar container to job manifest
 		job = addSidecarDockerContainer(job)
 	}
 
@@ -200,26 +200,10 @@ func isDockerActionEnabled(job *run.Job) bool {
 	return false
 }
 
-func addSidecarDockerContainer(job *run.Job) run.Job {
+func addSidecarDockerContainer(job *run.Job) *run.Job {
 	job.Spec.Template.Spec.Template.Spec.Containers[1] = &run.Container{
-		Name: "docker",
-
-		Args:                     nil,
-		Command:                  nil,
-		Env:                      nil,
-		EnvFrom:                  nil,
-		Image:                    "",
-		ImagePullPolicy:          "",
-		LivenessProbe:            nil,
-		Ports:                    nil,
-		ReadinessProbe:           nil,
-		Resources:                nil,
-		SecurityContext:          nil,
-		StartupProbe:             nil,
-		TerminationMessagePath:   "",
-		TerminationMessagePolicy: "",
-		VolumeMounts:             nil,
-		WorkingDir:               "",
+		Name:  "docker",
+		Image: "docker:dind-rootless",
 	}
 
 	return job
