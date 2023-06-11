@@ -11,8 +11,8 @@ lint:
 	golangci-lint run -v
 
 lint-fix:
-	golangci-lint run -v --fix
 	fieldalignment -fix ./... # golangci-lint does not support fieldalignment with --fix yet
+	golangci-lint run -v --fix
 
 .PHONY: helper/list-all-queued-workflows helper/stop-all-queued-workflows
 helper/list-all-queued-workflows:

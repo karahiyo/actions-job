@@ -18,9 +18,9 @@ import (
 )
 
 type Controller struct {
-	ghAdapter   adapter.GitHubAdapter
-	jobsAdapter adapter.JobsAdapter
-	validate    *validator.Validate
+	ghAdapter adapter.GitHubAdapter
+	// jobsAdapter adapter.JobsAdapter
+	validate *validator.Validate
 }
 
 var (
@@ -34,15 +34,9 @@ func NewController(ctx context.Context) (*Controller, error) {
 		return nil, fmt.Errorf("failed to initialize github client: %w", err)
 	}
 
-	jobsAdapter, err := adapter.NewJobsAdapter(ctx, config.GetGCPConfig().Region)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize jobs client: %w", err)
-	}
-
 	return &Controller{
-		ghAdapter:   ghAdapter,
-		jobsAdapter: jobsAdapter,
-		validate:    validator.New(),
+		ghAdapter: ghAdapter,
+		validate:  validator.New(),
 	}, nil
 }
 
@@ -50,16 +44,20 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 	logger := zerolog.Ctx(ctx)
 
 	if !event.GetRepo().GetPrivate() {
-		return fmt.Errorf("skipped. using self-hosted runner with public repositories is very dangerous: %w", ErrBadRequest)
+		return fmt.Errorf("skipped. using self-hosted runner with public repositories is a security vulnerability: %w", ErrBadRequest)
 	}
 
 	if event.GetRepo().GetFork() {
-		return fmt.Errorf("skipped. using self-hosted runner with forked repositories is very dangerous: %w", ErrBadRequest)
+		return fmt.Errorf("skipped. using self-hosted runner with forked repositories is a security vulnerability: %w", ErrBadRequest)
 	}
 
 	if event.GetAction() != "queued" {
 		return fmt.Errorf("event is not \"queued\" action: %w", ErrNonTargetEvent)
 	}
+
+	ownerRepo := strings.Split(event.GetRepo().GetFullName(), "/")
+	owner := ownerRepo[0]
+	repo := ownerRepo[1]
 
 	labels := event.GetWorkflowJob().Labels
 	if !includeSelfHostedLabel(labels) {
@@ -75,10 +73,6 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 
 		return fmt.Errorf("validation error: err = %w", err)
 	}
-
-	ownerRepo := strings.Split(event.GetRepo().GetFullName(), "/")
-	owner := ownerRepo[0]
-	repo := ownerRepo[1]
 
 	// default use current commit SHA as ref.
 	// TODO: support manual specification of ref
@@ -102,7 +96,24 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 		labels: labels,
 	})
 
-	if err := c.dispatchJobTransaction(ctx, labeledOpts.project, jobName, job); err != nil {
+	project := labeledOpts.project
+	region := labeledOpts.region
+	if project == "" || region == "" {
+		instanceMeta, err := adapter.GetInstanceMetadata(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to get instance metadata: %w", err)
+		}
+
+		if project == "" {
+			project = instanceMeta.ProjectID
+		}
+
+		if region == "" {
+			region = instanceMeta.Region
+		}
+	}
+
+	if err := c.dispatchJobTransaction(ctx, project, region, jobName, job); err != nil {
 		return fmt.Errorf("failed to dispatch job: %w", err)
 	}
 
@@ -110,11 +121,16 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 }
 
 // dispatchJobTransaction Create/Update Cloud Run Jobs and start a job execution
-func (c *Controller) dispatchJobTransaction(ctx context.Context, project, jobName string, job *run.Job) error {
+func (c *Controller) dispatchJobTransaction(ctx context.Context, project, region, jobName string, job *run.Job) error {
 	logger := zerolog.Ctx(ctx)
 	var err error
 
-	exists, err := c.jobsAdapter.GetJob(ctx, project, jobName)
+	jobsAdapter, err := adapter.NewJobsAdapter(ctx, project, region)
+	if err != nil {
+		return fmt.Errorf("failed to initialize jobs client: %w", err)
+	}
+
+	exists, err := jobsAdapter.GetJob(ctx, jobName)
 	if err != nil && !errors.Is(err, adapter.ErrJobNotFound) {
 		return fmt.Errorf("failed to check job exists: %w", err)
 	}
@@ -122,7 +138,7 @@ func (c *Controller) dispatchJobTransaction(ctx context.Context, project, jobNam
 	if exists == nil {
 		logger.Info().Msgf("job does not exists. creating new job...")
 
-		created, err := c.jobsAdapter.CreateJob(ctx, project, job)
+		created, err := jobsAdapter.CreateJob(ctx, job)
 		if err != nil {
 			return fmt.Errorf("failed to create job: %w", err)
 		}
@@ -132,7 +148,7 @@ func (c *Controller) dispatchJobTransaction(ctx context.Context, project, jobNam
 		log.Info().Msgf("job already exists. updating job...")
 		// TODO: check need to update current job
 
-		updated, err := c.jobsAdapter.UpdateJob(ctx, project, jobName, job)
+		updated, err := jobsAdapter.UpdateJob(ctx, jobName, job)
 		if err != nil {
 			return fmt.Errorf("failed to update job: job=%s, %w", spew.Sdump(job), err)
 		}
@@ -140,12 +156,12 @@ func (c *Controller) dispatchJobTransaction(ctx context.Context, project, jobNam
 		logger.Info().Msgf("success to update the job: %s", spew.Sdump(updated))
 	}
 
-	_, err = c.jobsAdapter.WaitJobReady(ctx, project, jobName)
+	_, err = jobsAdapter.WaitJobReady(ctx, jobName)
 	if err != nil {
 		return fmt.Errorf("failed to wait job ready: %w", err)
 	}
 
-	newExecution, err := c.jobsAdapter.StartJob(ctx, project, jobName)
+	newExecution, err := jobsAdapter.StartJob(ctx, jobName)
 	if err != nil {
 		return fmt.Errorf("failed to start job: %w", err)
 	}
@@ -166,8 +182,8 @@ func includeSelfHostedLabel(labels []string) bool {
 }
 
 type labeledOptions struct {
-	project     string `required:"true"`
-	region      string `required:"true"`
+	project     string
+	region      string
 	jobManifest string `required:"true"`
 }
 
@@ -205,7 +221,6 @@ func parseJobManifest(in []byte) (*run.Job, error) {
 }
 
 type jobEnvs struct {
-	// location string // TODO: use this field to create job
 	owner  string
 	repo   string
 	labels []string
