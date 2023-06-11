@@ -19,8 +19,7 @@ import (
 
 type Controller struct {
 	ghAdapter adapter.GitHubAdapter
-	// jobsAdapter adapter.JobsAdapter
-	validate *validator.Validate
+	validate  *validator.Validate
 }
 
 var (
