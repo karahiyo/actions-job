@@ -1,0 +1,18 @@
+version: '3'
+services:
+  job:
+    build:
+      context: .
+      dockerfile: actions-job-dood.ubuntu-22.04.dockerfile
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+    depends_on:
+      - docker
+
+  docker:
+    image: docker:dind-rootless
+    privileged: true
+
+volumes:
+  docker-sock:
+

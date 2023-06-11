@@ -95,6 +95,11 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 		labels: labels,
 	})
 
+	if isDockerActionEnabled(job) {
+		// TODO: if job has dood enabled option, add sidecar container to job manifest
+		job = addSidecarDockerContainer(job)
+	}
+
 	project := labeledOpts.project
 	region := labeledOpts.region
 	if project == "" || region == "" {
@@ -182,6 +187,42 @@ func includeSelfHostedLabel(labels []string) bool {
 		}
 	}
 	return false
+}
+
+func isDockerActionEnabled(job *run.Job) bool {
+	for _, container := range job.Spec.Template.Spec.Template.Spec.Containers {
+		for _, env := range container.Env {
+			if env.Name == "DOCKER_ACTION_ENABLED" && env.Value == "true" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func addSidecarDockerContainer(job *run.Job) run.Job {
+	job.Spec.Template.Spec.Template.Spec.Containers[1] = &run.Container{
+		Name: "docker",
+
+		Args:                     nil,
+		Command:                  nil,
+		Env:                      nil,
+		EnvFrom:                  nil,
+		Image:                    "",
+		ImagePullPolicy:          "",
+		LivenessProbe:            nil,
+		Ports:                    nil,
+		ReadinessProbe:           nil,
+		Resources:                nil,
+		SecurityContext:          nil,
+		StartupProbe:             nil,
+		TerminationMessagePath:   "",
+		TerminationMessagePolicy: "",
+		VolumeMounts:             nil,
+		WorkingDir:               "",
+	}
+
+	return job
 }
 
 type labeledOptions struct {
