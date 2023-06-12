@@ -4,7 +4,10 @@ ARG RUNNER_VERSION=2.304.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update \
-    && apt-get install -y \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository -y ppa:git-core/ppa \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     dbus-user-session \
@@ -15,7 +18,11 @@ RUN apt-get -y update \
     kmod \
     locales \
     sudo \
-    uidmap
+    uidmap \
+    && rm -rf /var/lib/apt/lists/*
+
+# ref https://github.com/actions/actions-runner-controller/issues/2143#issuecomment-1424462740
+RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
 
 ARG RUNNER_USER_UID=1001
 RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner
@@ -23,10 +30,11 @@ RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner
 ENV HOME=/home/runner
 
 ## Set-up subuid and subgid so that "--userns-remap=default" works
-RUN addgroup --system dockremap \
-    && adduser --system --ingroup dockremap dockremap \
-    && echo 'dockremap:165536:65536' >> /etc/subuid \
-    && echo 'dockremap:165536:65536' >> /etc/subgid
+RUN set -eux; \
+    addgroup --system dockremap; \
+    adduser --system --ingroup dockremap dockremap; \
+    echo 'dockremap:165536:65536' >> /etc/subuid; \
+    echo 'dockremap:165536:65536' >> /etc/subgid
 
 ENV RUNNER_ASSETS_DIR=/runnertmp
 RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
@@ -36,10 +44,19 @@ RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
     && rm ./runner.tar.gz \
     && ./bin/installdependencies.sh
 
+ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
+RUN mkdir /opt/hostedtoolcache \
+    && chgrp runner /opt/hostedtoolcache \
+    && chmod g+rwx /opt/hostedtoolcache
+
 # Make the rootless runner directory executable
 RUN mkdir /run/user/1000 \
     && chown runner:runner /run/user/1000 \
     && chmod a+x /run/user/1000
+
+RUN mkdir -p /home/runner/.local/share \
+    && chmod 755 /home/runner/.local/share \
+    && chown runner:runner /home/runner/.local/share
 
 COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
