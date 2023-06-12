@@ -84,8 +84,7 @@ func (m *MetadataClient) getRegion(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
-	region := string(body)
-	// for example, for the following string: `/project/xxx/regions/yyy`
+	region := string(body) // the response body is similar to the following `/project/xxx/regions/yyy`
 	if strings.Contains(region, "/regions/") {
 		splitted := strings.Split(region, "/")
 		region = splitted[len(splitted)-1]
