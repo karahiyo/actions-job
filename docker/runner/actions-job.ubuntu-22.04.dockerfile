@@ -6,7 +6,7 @@ ARG RUNNER_VERSION=2.304.0
 ARG RUNNER_UID=1000
 ARG DOCKER_GID=1001
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update \
     && apt-get install -y \
     curl \

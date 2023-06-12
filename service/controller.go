@@ -102,6 +102,7 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 		if err != nil {
 			return fmt.Errorf("failed to get instance metadata: %w", err)
 		}
+		logger.Debug().Msgf("get actions-job-controller instance metadata: %s", spew.Sdump(instanceMeta))
 
 		if project == "" {
 			project = instanceMeta.ProjectID
@@ -111,6 +112,7 @@ func (c *Controller) ReceiveWorkflowJobEvent(ctx context.Context, event *github.
 			region = instanceMeta.Region
 		}
 	}
+	logger.Info().Msgf("detected job launch options: project=%s, region=%s", project, region)
 
 	if err := c.dispatchJobTransaction(ctx, project, region, jobName, job); err != nil {
 		return fmt.Errorf("failed to dispatch job: %w", err)
