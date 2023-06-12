@@ -23,6 +23,8 @@ jobs:
         include:
           - name: actions-job
             os: ubuntu-22.04
+          - name: actions-job-dind-rootless
+            os: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v3
