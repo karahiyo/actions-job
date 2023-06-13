@@ -54,7 +54,7 @@ RUN mkdir /run/user/1000 \
     && chown runner:runner /run/user/1000 \
     && chmod a+x /run/user/1000
 
-RUN mkdir /home/runner/.local/share \
+RUN mkdir -p /home/runner/.local/share \
     && chmod 755 /home/runner/.local/share \
     && chown runner:runner /home/runner/.local/share
 
