@@ -4,7 +4,7 @@ ARG RUNNER_VERSION=2.304.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update \
-    && apt-get install -y \
+    && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     dbus-user-session \

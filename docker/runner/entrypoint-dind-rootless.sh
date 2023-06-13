@@ -3,7 +3,7 @@
 echo "Start Docker daemon (rootless)"
 dockerd-rootless.sh  --iptables=false &
 
-for i in {1..10}; do
+for i in {1..5}; do
   if docker info &>/dev/null; then
     break
   fi
