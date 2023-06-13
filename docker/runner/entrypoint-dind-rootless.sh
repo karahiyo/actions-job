@@ -21,7 +21,8 @@ jq ".\"registry-mirrors\"[0] = \"${DOCKER_REGISTRY_MIRROR}\"" /home/runner/.conf
 fi
 
 echo "Start Docker daemon (rootless)"
-dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json --propagation=rprivate &
+export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
+dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
 
 for i in {1..5}; do
   if docker info &>/dev/null; then
