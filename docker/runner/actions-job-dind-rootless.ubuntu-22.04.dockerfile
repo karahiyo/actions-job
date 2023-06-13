@@ -19,6 +19,7 @@ RUN apt-get -y update \
 
 # ref https://github.com/actions/actions-runner-controller/issues/2143#issuecomment-1424462740
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+RUN /sbin/modprobe tap
 
 ARG RUNNER_USER_UID=1001
 RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner
