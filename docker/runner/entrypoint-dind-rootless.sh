@@ -22,6 +22,7 @@ fi
 
 echo "Start Docker daemon (rootless)"
 export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
+export DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns
 dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
 
 for i in {1..5}; do
