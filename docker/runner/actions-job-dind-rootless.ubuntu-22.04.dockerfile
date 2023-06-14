@@ -19,6 +19,7 @@ RUN apt-get -y update \
     locales \
     sudo \
     uidmap \
+    slirp4netns \
     && rm -rf /var/lib/apt/lists/*
 
 # ref https://github.com/actions/actions-runner-controller/issues/2143#issuecomment-1424462740
