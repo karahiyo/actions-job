@@ -21,7 +21,9 @@ jq ".\"registry-mirrors\"[0] = \"${DOCKER_REGISTRY_MIRROR}\"" /home/runner/.conf
 fi
 
 echo "Start Docker daemon (rootless)"
-export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug --subid-source=static
+export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
+export DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns
+export DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns
 dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
 
 for i in {1..5}; do
@@ -32,7 +34,10 @@ for i in {1..5}; do
   sleep 1
 done
 
-docker info
+if ! docker info; then
+  echo "failed to start Docker daemon" >&2
+  exit 1
+fi
 
 echo "Start GitHub Actions Runner"
 startup.sh

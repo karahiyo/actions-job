@@ -69,12 +69,7 @@ RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 ENV PATH="/home/runner/bin:${PATH}"
 ENV ImageOS=ubuntu22
 ENV XDG_RUNTIME_DIR=/run/user/1000
-#ENV XDG_RUNTIME_DIR=/home/runner/.docker/run
 ENV DOCKER_HOST=unix:///run/user/1000/docker.sock
-#ENV DOCKER_HOST=unix:///home/runner/.docker/run/docker.sock
-
-# data directory for the docker daemon: /home/runner/.local/share/docker
-# config directory for the docker daemon: /home/runner/.config/docker
 
 RUN echo "PATH=${PATH}" > /etc/environment \
     && echo "ImageOS=${ImageOS}" >> /etc/environment \
