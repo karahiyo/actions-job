@@ -59,6 +59,10 @@ RUN mkdir -p /home/runner/.local/share \
     && chmod 755 /home/runner/.local/share \
     && chown runner:runner /home/runner/.local/share
 
+# Copy the docker shim which propagates the docker MTU to underlying networks
+# to replace the docker binary in the PATH.
+COPY docker-shim.sh /usr/local/bin/docker
+
 COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 
