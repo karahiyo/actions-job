@@ -31,8 +31,12 @@ so that rootless dockerd will not fail with a permission error when creating /ho
   fi
 fi
 
+if [ "${DEBUG}" == "true" ]; then
+  jq ".\"debug\" = ${DEBUG}" /home/runner/.config/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /home/runner/.config/docker/daemon.json
+  export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
+fi
+
 echo "Start Docker daemon (rootless)"
-export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
 export DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns
 export DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns
 dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
