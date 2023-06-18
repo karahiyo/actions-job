@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ARG RUNNER_VERSION=2.304.0
 
@@ -8,17 +8,36 @@ RUN apt-get update -y \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
+    build-essential \
     ca-certificates \
+    dnsutils \
+    ftp \
     curl \
     dbus-user-session \
+    dumb-init \
     git \
     iproute2 \
+    iputils-ping \
     iptables \
     jq \
+    libunwind8 \
     kmod \
     locales \
+    netcat \
+    net-tools \
+    openssh-client \
+    parallel \
+    rsync \
     sudo \
+    telnet \
+    time \
+    tzdata \
     uidmap \
+    upx \
+    wget \
+    zstd \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
+    && ln -sf /usr/bin/pip3 /usr/bin/pip \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -29,8 +48,8 @@ RUN curl -o /usr/bin/slirp4netns --fail -L https://github.com/rootless-container
 # ref https://github.com/actions/actions-runner-controller/issues/2143#issuecomment-1424462740
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
 
-ARG RUNNER_USER_UID=1001
-RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner
+ARG RUNNER_UID=1000
+RUN adduser --disabled-password --gecos "" --uid $RUNNER_UID runner
 
 ENV HOME=/home/runner
 
@@ -47,7 +66,8 @@ RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
     && curl -sfLo runner.tar.gz -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
     && tar xzf ./runner.tar.gz \
     && rm ./runner.tar.gz \
-    && ./bin/installdependencies.sh
+    && ./bin/installdependencies.sh \
+    && mv ./externals ./externalstmp
 
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
 RUN mkdir /opt/hostedtoolcache \
@@ -55,9 +75,9 @@ RUN mkdir /opt/hostedtoolcache \
     && chmod g+rwx /opt/hostedtoolcache
 
 # Make the rootless runner directory executable
-RUN mkdir /run/user/1000 \
-    && chown runner:runner /run/user/1000 \
-    && chmod a+x /run/user/1000
+RUN mkdir /run/user/$RUNNER_UID \
+    && chown runner:runner /run/user/$RUNNER_UID \
+    && chmod a+x /run/user/$RUNNER_UID
 
 RUN mkdir -p /home/runner/.local/share \
     && chmod 755 /home/runner/.local/share \
@@ -71,9 +91,9 @@ COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 
 ENV PATH="/home/runner/bin:${HOME}/.local/bin:${PATH}"
-ENV ImageOS=ubuntu22
-ENV XDG_RUNTIME_DIR=/run/user/1000
-ENV DOCKER_HOST=unix:///run/user/1000/docker.sock
+ENV ImageOS=ubuntu20
+ENV XDG_RUNTIME_DIR=/run/user/$RUNNER_UID
+ENV DOCKER_HOST=unix:///run/user/$RUNNER_UID/docker.sock
 
 RUN echo "PATH=${PATH}" > /etc/environment \
     && echo "ImageOS=${ImageOS}" >> /etc/environment \
