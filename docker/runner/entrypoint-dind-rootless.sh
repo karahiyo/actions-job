@@ -37,8 +37,7 @@ if [ "${DEBUG}" == "true" ]; then
 fi
 
 echo "Start Docker daemon (rootless)"
-export DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns
-export DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns
+dumb-init bash <<'SCRIPT' &
 dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
 
 for i in {1..5}; do
@@ -56,3 +55,10 @@ fi
 
 echo "Start GitHub Actions Runner"
 startup.sh
+SCRIPT
+
+RUNNER_INIT_PID=$!
+echo "Runner init started with pid $RUNNER_INIT_PID"
+wait $RUNNER_INIT_PID
+
+trap - TERM

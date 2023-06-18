@@ -14,6 +14,7 @@ RUN apt-get update -y \
     ftp \
     curl \
     dbus-user-session \
+    dumb-init \
     git \
     iproute2 \
     iputils-ping \
@@ -89,7 +90,7 @@ COPY docker-shim.sh /usr/local/bin/docker
 COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 
-ENV PATH="/home/runner/bin:${PATH}"
+ENV PATH="/home/runner/bin:${HOME}/.local/bin:${PATH}"
 ENV ImageOS=ubuntu20
 ENV XDG_RUNTIME_DIR=/run/user/$RUNNER_UID
 ENV DOCKER_HOST=unix:///run/user/$RUNNER_UID/docker.sock

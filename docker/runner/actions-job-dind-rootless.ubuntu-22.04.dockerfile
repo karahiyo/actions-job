@@ -70,7 +70,7 @@ COPY docker-shim.sh /usr/local/bin/docker
 COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 
-ENV PATH="/home/runner/bin:${PATH}"
+ENV PATH="/home/runner/bin:${HOME}/.local/bin:${PATH}"
 ENV ImageOS=ubuntu22
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV DOCKER_HOST=unix:///run/user/1000/docker.sock
