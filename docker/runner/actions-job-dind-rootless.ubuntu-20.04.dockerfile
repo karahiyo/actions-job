@@ -54,8 +54,8 @@ ENV HOME=/home/runner
 RUN set -eux; \
     addgroup --system dockremap; \
     adduser --system --ingroup dockremap dockremap; \
-    echo 'dockremap:100000:65536' >> /etc/subuid; \
-    echo 'dockremap:100000:65536' >> /etc/subgid
+    echo 'dockremap:165536:65536' >> /etc/subuid; \
+    echo 'dockremap:165536:65536' >> /etc/subgid
 
 ENV RUNNER_ASSETS_DIR=/runnertmp
 RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
