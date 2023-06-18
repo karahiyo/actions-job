@@ -52,6 +52,7 @@ jobs:
             type=semver,pattern={{version}},prefix=${{ matrix.os }}-
             type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.os }}-
             type=sha,prefix=${{ matrix.os }}-
+            type=raw,value=${{ matrix.os }}
           flavor: |
             latest=true
 
