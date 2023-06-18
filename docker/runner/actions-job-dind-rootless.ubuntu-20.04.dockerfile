@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ARG RUNNER_VERSION=2.304.0
 
@@ -8,17 +8,33 @@ RUN apt-get update -y \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
+    build-essential \
     ca-certificates \
+    dnsutils \
+    ftp \
     curl \
     dbus-user-session \
     git \
     iproute2 \
+    iputils-ping \
     iptables \
     jq \
+    libunwind8 \
     kmod \
     locales \
+    netcat \
+    net-tools \
+    openssh-client \
+    parallel \
+    rsync \
     sudo \
+    telnet \
+    time \
+    tzdata \
     uidmap \
+    upx \
+    wget \
+    zstd \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -71,7 +87,7 @@ COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
 
 ENV PATH="/home/runner/bin:${PATH}"
-ENV ImageOS=ubuntu22
+ENV ImageOS=ubuntu20
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV DOCKER_HOST=unix:///run/user/1000/docker.sock
 

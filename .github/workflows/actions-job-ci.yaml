@@ -24,6 +24,8 @@ jobs:
           - name: actions-job
             os: ubuntu-22.04
           - name: actions-job-dind-rootless
+            os: ubuntu-20.04
+          - name: actions-job-dind-rootless
             os: ubuntu-22.04
 
     steps:
@@ -43,12 +45,13 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.name }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.name }}.${{ matrix.os }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=sha
           flavor: |
             latest=true
 
