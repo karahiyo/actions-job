@@ -45,13 +45,13 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.name }}.${{ matrix.os }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.name }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=ref,event=branch,prefix=${{ matrix.os }}
+            type=ref,event=pr,prefix=${{ matrix.os }}
+            type=semver,pattern={{version}},prefix=${{ matrix.os }}
+            type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.os }}
+            type=sha,prefix=${{ matrix.os }}
           flavor: |
             latest=true
 
