@@ -28,6 +28,7 @@ RUN apt-get update -y \
     openssh-client \
     parallel \
     rsync \
+    software-properties-common \
     sudo \
     telnet \
     time \
