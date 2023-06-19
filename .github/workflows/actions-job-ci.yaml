@@ -23,14 +23,27 @@ jobs:
         include:
           - name: actions-job
             os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1001
+              DOCKER_GID=121
           - name: actions-job-dind
             os: ubuntu-20.04
+            args: |
+              RUNNER_UID=1001
+              DOCKER_GID=121
           - name: actions-job-dind
             os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1001
+              DOCKER_GID=121
           - name: actions-job-dind-rootless
             os: ubuntu-20.04
+            args: |
+              RUNNER_UID=1001
           - name: actions-job-dind-rootless
             os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1001
 
     steps:
       - uses: actions/checkout@v3
@@ -65,6 +78,7 @@ jobs:
         with:
           context: ./docker/runner
           file: ./docker/runner/${{ matrix.name }}.${{ matrix.os }}.dockerfile
+          build-args: ${{ matrix.args }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

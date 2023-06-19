@@ -31,23 +31,9 @@ fi
 
 SCRIPT
 
-echo "Start Docker daemon"
 dumb-init bash <<'SCRIPT' &
-
+echo "Start Docker daemon"
 sudo /usr/bin/dockerd &
-
-for i in {1..5}; do
-  if docker info &>/dev/null; then
-    break
-  fi
-  echo "Waiting for Docker daemon to start..."
-  sleep 1
-done
-
-if ! docker info; then
-  echo "failed to start Docker daemon" >&2
-  exit 1
-fi
 
 if [ -n "${MTU}" ]; then
   sudo ifconfig docker0 mtu "${MTU}" up

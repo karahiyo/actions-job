@@ -3,6 +3,7 @@ FROM ubuntu:20.04
 ARG RUNNER_VERSION=2.304.0
 ARG DOCKER_VERSION=20.10.23
 
+# Use uid=1001, gid=121 for compatibility with GithHub-hosted runners
 ARG RUNNER_UID=1000
 ARG DOCKER_GID=1001
 
@@ -64,6 +65,12 @@ RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
     && tar xzf ./runner.tar.gz \
     && rm ./runner.tar.gz \
     && ./bin/installdependencies.sh
+
+ENV RUNNER_HOME=/runner
+ENV RUNNER_WORKDIR=${RUNNER_HOME}/_work
+RUN mkdir -p "${RUNNER_HOME}" \
+    && chgrp runner "${RUNNER_HOME}" \
+    && chmod g+rwx "${RUNNER_HOME}"
 
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
 RUN mkdir /opt/hostedtoolcache \

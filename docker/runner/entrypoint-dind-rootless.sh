@@ -36,22 +36,9 @@ if [ "${DEBUG}" == "true" ]; then
   export DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS=--debug
 fi
 
-echo "Start Docker daemon (rootless)"
 dumb-init bash <<'SCRIPT' &
+echo "Start Docker daemon (rootless)"
 dockerd-rootless.sh --config-file /home/runner/.config/docker/daemon.json &
-
-for i in {1..5}; do
-  if docker info &>/dev/null; then
-    break
-  fi
-  echo "Waiting for Docker daemon to start..."
-  sleep 1
-done
-
-if ! docker info; then
-  echo "failed to start Docker daemon" >&2
-  exit 1
-fi
 
 echo "Start GitHub Actions Runner"
 startup.sh

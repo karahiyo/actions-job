@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 RUNNER_ASSETS_DIR=${RUNNER_ASSETS_DIR:-/runnertmp}
-RUNNER_HOME=${RUNNER_HOME:-/home/runner}
+RUNNER_HOME=${RUNNER_HOME:-/runner}
 
 if [ ! -d "${RUNNER_HOME}" ]; then
   echo "$RUNNER_HOME should be an emptyDir mount. Please fix the pod spec." >&2
@@ -62,9 +62,11 @@ fi
   --name "${RUNNER_NAME}" \
   --replace \
   --ephemeral \
+  --work "${RUNNER_WORKDIR}" \
   "${config_args[@]}"
 
 # Unset entrypoint environment variables so they don't leak into the runner environment
 unset OWNER REPO LABELS ACCESS_TOKEN RUNNER_TOKEN RUNNER_NAME
 
-./run.sh
+# shellcheck disable=SC2154
+exec env -- "${env[@]}" ./run.sh
