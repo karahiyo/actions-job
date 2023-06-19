@@ -12,38 +12,14 @@ RUN apt-get update -y \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
-    build-essential \
     ca-certificates \
     curl \
-    dnsutils \
-    ftp \
     dumb-init \
     git \
-    iproute2 \
-    iputils-ping \
     iptables \
     jq \
-    libunwind8 \
-    kmod \
-    locales \
-    netcat \
-    net-tools \
-    openssh-client \
-    parallel \
-    python3-pip \
-    rsync \
-    shellcheck \
     software-properties-common \
     sudo \
-    telnet \
-    time \
-    tzdata \
-    uidmap \
-    upx \
-    wget \
-    zstd \
-    && ln -sf /usr/bin/python3 /usr/bin/python \
-    && ln -sf /usr/bin/pip3 /usr/bin/pip \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -87,7 +63,7 @@ RUN chmod +x /usr/bin/entrypoint-dind.sh /usr/bin/startup.sh
 VOLUME /var/lib/docker
 
 ENV PATH="${PATH}:${HOME}/.local/bin"
-ENV ImageOS=ubuntu20
+ENV ImageOS=ubuntu22
 
 RUN echo "PATH=${PATH}" > /etc/environment \
     && echo "ImageOS=${ImageOS}" >> /etc/environment

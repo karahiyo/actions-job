@@ -25,6 +25,8 @@ jobs:
             os: ubuntu-22.04
           - name: actions-job-dind
             os: ubuntu-20.04
+          - name: actions-job-dind
+            os: ubuntu-22.04
           - name: actions-job-dind-rootless
             os: ubuntu-20.04
           - name: actions-job-dind-rootless
