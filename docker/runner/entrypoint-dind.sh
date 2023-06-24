@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
+id
+
 sudo /bin/bash <<SCRIPT
 mkdir -p /etc/docker/
 
 if [ ! -f /etc/docker/daemon.json ]; then
   echo "{}" > /etc/docker/daemon.json
 fi
+
+# userns remap
+# jq ".\"userns-remap\" = \"runner:docker\"" /etc/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /etc/docker/daemon.json
 
 if [ -n "${MTU}" ]; then
 jq ".\"mtu\" = ${MTU}" /etc/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /etc/docker/daemon.json

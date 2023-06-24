@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-ARG RUNNER_VERSION=2.304.0
+ARG RUNNER_VERSION=2.305.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -48,8 +48,10 @@ RUN curl -o /usr/bin/slirp4netns --fail -L https://github.com/rootless-container
 
 # ref https://github.com/actions/actions-runner-controller/issues/2143#issuecomment-1424462740
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+RUN update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
-ARG RUNNER_UID=1000
+# Use 1001 for compatibility with GitHub-hosted runners
+ARG RUNNER_UID=1001
 RUN adduser --disabled-password --gecos "" --uid $RUNNER_UID runner
 
 ENV HOME=/home/runner
@@ -87,6 +89,7 @@ RUN mkdir -p /home/runner/.local/share \
 # Copy the docker shim which propagates the docker MTU to underlying networks
 # to replace the docker binary in the PATH.
 COPY docker-shim.sh /usr/local/bin/docker
+RUN chmod +x /usr/local/bin/docker
 
 COPY entrypoint-dind-rootless.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind-rootless.sh /usr/bin/startup.sh
