@@ -24,18 +24,18 @@ jobs:
           - name: actions-job
             os: ubuntu-22.04
             args: |
-              RUNNER_UID=1001
-              DOCKER_GID=121
+              RUNNER_UID=1000
+              DOCKER_GID=1001
           - name: actions-job-dind
             os: ubuntu-20.04
             args: |
-              RUNNER_UID=1001
-              DOCKER_GID=121
+              RUNNER_UID=1000
+              DOCKER_GID=1001
           - name: actions-job-dind
             os: ubuntu-22.04
             args: |
               RUNNER_UID=1001
-              DOCKER_GID=121
+              DOCKER_GID=123
           - name: actions-job-dind-rootless
             os: ubuntu-20.04
             args: |
@@ -78,7 +78,7 @@ jobs:
         with:
           context: ./docker/runner
           file: ./docker/runner/${{ matrix.name }}.${{ matrix.os }}.dockerfile
-          build-args: ${{ matrix.args }}
+#          build-args: ${{ matrix.args }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

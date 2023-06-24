@@ -1,10 +1,11 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-ARG RUNNER_VERSION=2.304.0
+ARG RUNNER_VERSION=2.305.0
 ARG DOCKER_VERSION=20.10.23
 
-ARG RUNNER_UID=1000
-ARG DOCKER_GID=1001
+# Use 1001 and 121 for compatibility with GitHub-hosted runners
+ARG RUNNER_UID=1001
+ARG DOCKER_GID=123
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -42,9 +43,9 @@ RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
     && ./bin/installdependencies.sh
 
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
-RUN mkdir /opt/hostedtoolcache \
-    && chgrp runner /opt/hostedtoolcache \
-    && chmod g+rwx /opt/hostedtoolcache
+RUN mkdir ${RUNNER_TOOL_CACHE} \
+    && chgrp runner ${RUNNER_TOOL_CACHE} \
+    && chmod g+rwx ${RUNNER_TOOL_CACHE}
 
 RUN set -vx; \
     export ARCH=x86_64 \
@@ -56,6 +57,7 @@ RUN set -vx; \
 # Copy the docker shim which propagates the docker MTU to underlying networks
 # to replace the docker binary in the PATH.
 COPY docker-shim.sh /usr/local/bin/docker
+RUN chmod +x /usr/local/bin/docker
 
 COPY entrypoint-dind.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind.sh /usr/bin/startup.sh

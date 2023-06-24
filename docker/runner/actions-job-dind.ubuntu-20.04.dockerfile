@@ -1,9 +1,8 @@
 FROM ubuntu:20.04
 
-ARG RUNNER_VERSION=2.304.0
+ARG RUNNER_VERSION=2.305.0
 ARG DOCKER_VERSION=20.10.23
 
-# Use uid=1001, gid=121 for compatibility with GithHub-hosted runners
 ARG RUNNER_UID=1000
 ARG DOCKER_GID=1001
 
@@ -66,12 +65,6 @@ RUN mkdir -p "${RUNNER_ASSETS_DIR}" \
     && rm ./runner.tar.gz \
     && ./bin/installdependencies.sh
 
-ENV RUNNER_HOME=/runner
-ENV RUNNER_WORKDIR=${RUNNER_HOME}/_work
-RUN mkdir -p "${RUNNER_HOME}" \
-    && chgrp runner "${RUNNER_HOME}" \
-    && chmod g+rwx "${RUNNER_HOME}"
-
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
 RUN mkdir /opt/hostedtoolcache \
     && chgrp runner /opt/hostedtoolcache \
@@ -87,6 +80,7 @@ RUN set -vx; \
 # Copy the docker shim which propagates the docker MTU to underlying networks
 # to replace the docker binary in the PATH.
 COPY docker-shim.sh /usr/local/bin/docker
+RUN chmod +x /usr/local/bin/docker
 
 COPY entrypoint-dind.sh startup.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint-dind.sh /usr/bin/startup.sh
