@@ -10,7 +10,7 @@ if [ ! -f /etc/docker/daemon.json ]; then
 fi
 
 # userns remap
-# jq ".\"userns-remap\" = \"runner:docker\"" /etc/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /etc/docker/daemon.json
+jq ".\"userns-remap\" = \"runner:docker\"" /etc/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /etc/docker/daemon.json
 
 if [ -n "${MTU}" ]; then
 jq ".\"mtu\" = ${MTU}" /etc/docker/daemon.json > /tmp/.daemon.json && mv /tmp/.daemon.json /etc/docker/daemon.json
