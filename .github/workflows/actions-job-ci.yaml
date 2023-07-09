@@ -23,6 +23,27 @@ jobs:
         include:
           - name: actions-job
             os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1000
+              DOCKER_GID=1001
+          - name: actions-job-dind
+            os: ubuntu-20.04
+            args: |
+              RUNNER_UID=1000
+              DOCKER_GID=1001
+          - name: actions-job-dind
+            os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1001
+              DOCKER_GID=123
+          - name: actions-job-dind-rootless
+            os: ubuntu-20.04
+            args: |
+              RUNNER_UID=1001
+          - name: actions-job-dind-rootless
+            os: ubuntu-22.04
+            args: |
+              RUNNER_UID=1001
 
     steps:
       - uses: actions/checkout@v3
@@ -43,10 +64,12 @@ jobs:
           images: |
             ${{ secrets.DOCKER_USERNAME }}/${{ matrix.name }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=ref,event=branch,prefix=${{ matrix.os }}-
+            type=ref,event=pr,prefix=${{ matrix.os }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.os }}-
+            type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.os }}-
+            type=sha,prefix=${{ matrix.os }}-
+            type=raw,value=${{ matrix.os }}
           flavor: |
             latest=true
 
@@ -55,6 +78,7 @@ jobs:
         with:
           context: ./docker/runner
           file: ./docker/runner/${{ matrix.name }}.${{ matrix.os }}.dockerfile
+#          build-args: ${{ matrix.args }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

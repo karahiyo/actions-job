@@ -2,13 +2,16 @@
 
 RUNNER_ASSETS_DIR=${RUNNER_ASSETS_DIR:-/runnertmp}
 RUNNER_HOME=${RUNNER_HOME:-/home/runner}
+RUNNER_WORKDIR=${RUNNER_WORKDIR:-${RUNNER_HOME}/_work}
 
 if [ ! -d "${RUNNER_HOME}" ]; then
-  echo "$RUNNER_HOME should be an emptyDir mount. Please fix the pod spec." >&2
-  exit 1
+  echo "Create runner home directory: ${RUNNER_HOME}"
+  sudo mkdir -p "${RUNNER_HOME}"
+  sudo chown -R runner:docker "${RUNNER_HOME}"
 fi
 
 cp -r "$RUNNER_ASSETS_DIR"/* "$RUNNER_HOME"/
+
 if ! cd "${RUNNER_HOME}"; then
   echo "Failed to cd into ${RUNNER_HOME}" >&2
   exit 1
@@ -62,9 +65,11 @@ fi
   --name "${RUNNER_NAME}" \
   --replace \
   --ephemeral \
+  --work "${RUNNER_WORKDIR}" \
   "${config_args[@]}"
 
 # Unset entrypoint environment variables so they don't leak into the runner environment
 unset OWNER REPO LABELS ACCESS_TOKEN RUNNER_TOKEN RUNNER_NAME
 
-./run.sh
+mapfile -t env </etc/environment
+exec env -- "${env[@]}" ./run.sh
