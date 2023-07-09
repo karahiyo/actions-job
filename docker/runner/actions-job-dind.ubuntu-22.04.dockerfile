@@ -5,7 +5,7 @@ ARG DOCKER_VERSION=20.10.23
 
 # Use 1001 and 121 for compatibility with GitHub-hosted runners
 ARG RUNNER_UID=1001
-ARG DOCKER_GID=123
+ARG DOCKER_GID=121
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
