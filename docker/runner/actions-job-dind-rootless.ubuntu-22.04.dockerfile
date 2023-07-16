@@ -11,6 +11,7 @@ RUN apt-get update -y \
     ca-certificates \
     curl \
     dbus-user-session \
+    dumb-init \
     git \
     iproute2 \
     iptables \

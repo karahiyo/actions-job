@@ -11,6 +11,7 @@ RUN apt-get update -y \
     build-essential \
     ca-certificates \
     dnsutils \
+    dumb-init \
     ftp \
     curl \
     dbus-user-session \

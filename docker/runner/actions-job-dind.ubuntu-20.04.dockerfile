@@ -93,7 +93,7 @@ ENV ImageOS=ubuntu20
 RUN echo "PATH=${PATH}" > /etc/environment \
     && echo "ImageOS=${ImageOS}" >> /etc/environment
 
-USER $RUNNER_UID
+USER runner
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["entrypoint-dind.sh"]
