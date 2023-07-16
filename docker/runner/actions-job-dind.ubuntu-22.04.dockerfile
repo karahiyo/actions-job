@@ -70,7 +70,7 @@ ENV ImageOS=ubuntu22
 RUN echo "PATH=${PATH}" > /etc/environment \
     && echo "ImageOS=${ImageOS}" >> /etc/environment
 
-USER runner
+USER $RUNNER_UID
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["entrypoint-dind.sh"]
