@@ -3,7 +3,7 @@ module github.com/karahiyo/actions-job
 go 1.20
 
 require (
-	github.com/bradleyfalzon/ghinstallation/v2 v2.4.0
+	github.com/bradleyfalzon/ghinstallation/v2 v2.6.0
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-playground/validator/v10 v10.14.1
@@ -25,6 +25,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-github/v53 v53.2.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
