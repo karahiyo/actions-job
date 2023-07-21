@@ -3,6 +3,9 @@
 id
 
 sudo /bin/bash <<SCRIPT
+# Cloud Run not support Linux supplementary groups. see https://github.com/karahiyo/actions-job/issues/28
+usermod -aG docker runner
+
 mkdir -p /etc/docker/
 
 if [ ! -f /etc/docker/daemon.json ]; then
