@@ -19,6 +19,7 @@ RUN apt-get update -y \
     git \
     iptables \
     jq \
+    locales \
     software-properties-common \
     sudo \
     && rm -rf /var/lib/apt/lists/* \
