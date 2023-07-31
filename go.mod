@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v52 v52.0.0
-	github.com/rs/zerolog v1.29.1
+	github.com/rs/zerolog v1.30.0
 	google.golang.org/api v0.129.0
 	sigs.k8s.io/yaml v1.3.0
 )
